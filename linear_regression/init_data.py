@@ -18,7 +18,7 @@ def main():
     data={'area':xs,'price':ys}
     df = pd.DataFrame(data=data)
     print(df.head())
-    pd.DataFrame.to_csv(df,path_or_buf='housing_price_init.csv',index=None)
+    pd.DataFrame.to_csv(df, path_or_buf='housing_price_init.csv', index=None)
 
 def cal_y(o0,o1,x):
     print(o1)

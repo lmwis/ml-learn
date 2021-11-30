@@ -12,36 +12,45 @@ def main():
     print(data.head())
     print(data.columns)
 
-    class_data = pd.DataFrame(data,columns=['Survived','Pclass'])
-    draw_class_data_bar(class_data)
+    # class_data = pd.DataFrame(data,columns=['Survived','Pclass'])
+    # draw_class_data_bar(class_data)
 
-    sex_data = pd.DataFrame(data,columns=['Survived','Sex'])
+    # sex_data = pd.DataFrame(data,columns=['Survived','Sex'])
 
-    draw_sex_data_bar(sex_data)
+    # draw_sex_data_bar(sex_data)
 
     # test_data = pd.DataFrame(data,columns=['Survived','Pclass','Sex'])
     # draw_dot(test_data)
 
     # pick feature 'Pclass' and 'Sex' for logistic regression
-    train_X = pd.DataFrame(data,columns=['Pclass','Sex'])
-    train_X['Sex'] = data_clean(train_X)
+    train_X = pd.DataFrame(data,columns=['Pclass','Sex','Age'])
+    train_X = data_clean(train_X)
+
+    # checkout if has nan value
+    # print(train_X[train_X['Age'].isnull().values==True].head())
+
     y = pd.DataFrame(data,columns=['Survived'])
-    print(train_X.head())
-    print(y.head())
     lr = LogisticRegression(random_state=0).fit(train_X,y)
 
     # use module to predict test data
     test_data = pd.read_csv('test.csv')
-    test_X = pd.DataFrame(test_data,columns=['Pclass','Sex'])
+    test_X = pd.DataFrame(test_data,columns=['Pclass','Sex','Age'])
     test_X = data_clean(test_X)
-    output_Y = lr.predict(test_X)
-    print(output_Y.head())
+    output_y = lr.predict(test_X)
 
+    # save result
+    result = pd.DataFrame(test_data,columns=['PassengerId'])
+    result['Survived'] = pd.Series(output_y)
+    print(result.head())
+
+    pd.DataFrame.to_csv(result,path_or_buf='result.csv',index=False)
+    print('输出结果完成')
 def data_clean(data):
     data['Sex'] = data['Sex'].map({
         'male': 1,
         'female': 0
     })
+    data['Age'] = data['Age'].fillna(value=data['Age'].mean())
     return data
 
 def draw_dot(data):

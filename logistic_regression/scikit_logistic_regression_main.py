@@ -9,47 +9,79 @@ from sklearn.linear_model import LogisticRegression
 def main():
     data = pd.read_csv('train.csv')
     print(data.shape)
-    print(data.head())
+    print(data['SibSp'].head())
     print(data.columns)
 
-    # class_data = pd.DataFrame(data,columns=['Survived','Pclass'])
-    # draw_class_data_bar(class_data)
-
-    # sex_data = pd.DataFrame(data,columns=['Survived','Sex'])
-
-    # draw_sex_data_bar(sex_data)
 
     # test_data = pd.DataFrame(data,columns=['Survived','Pclass','Sex'])
     # draw_dot(test_data)
 
+    # build_module(data)
+
+    class_data = pd.DataFrame(data,columns=['Survived','Pclass'])
+    sex_data = pd.DataFrame(data,columns=['Survived','Sex'])
+    sibsp_data = pd.DataFrame(data,columns=['Survived','SibSp'])
+    parch_data = pd.DataFrame(data, columns=['Survived', 'Parch'])
+    age_data = pd.DataFrame(data, columns=['Survived', 'Age'])
+    ticket_data = pd.DataFrame(data, columns=['Survived', 'Ticket'])
+    fare_data = pd.DataFrame(data, columns=['Survived', 'Fare'])
+    cabin_data = pd.DataFrame(data, columns=['Survived', 'Cabin'])
+    embarked_data = pd.DataFrame(data, columns=['Survived', 'Embarked'])
+    # draw_sibsp_data_bar(sibsp_data)
+    # draw_discrete_feature_to_survived_data_bar(sibsp_data,'SibSp')
+    # draw_discrete_feature_to_survived_data_bar(class_data,'Pclass')
+    # draw_discrete_feature_to_survived_data_bar(sex_data,'Sex')
+    # draw_discrete_feature_to_survived_data_bar(parch_data,'Parch')
+    # draw_discrete_feature_to_survived_data_bar(age_data,'Age')
+    # draw_discrete_feature_to_survived_data_bar(ticket_data,'Ticket')
+    # draw_discrete_feature_to_survived_data_bar(fare_data,'Fare')
+    # draw_discrete_feature_to_survived_data_bar(embarked_data,'Embarked')
+    # draw_discrete_feature_to_survived_data_bar(cabin_data,'Cabin')
+
+    draw_discrete_feature_to_survived_rate_line(sibsp_data,'SibSp')
+    draw_discrete_feature_to_survived_rate_line(class_data,'Pclass')
+    draw_discrete_feature_to_survived_rate_line(sex_data,'Sex')
+    draw_discrete_feature_to_survived_rate_line(parch_data,'Parch')
+    draw_discrete_feature_to_survived_rate_line(ticket_data,'Ticket')
+    draw_discrete_feature_to_survived_rate_line(embarked_data,'Embarked')
+    draw_discrete_feature_to_survived_rate_line(cabin_data,'Cabin')
+
+    draw_continuous_feature_to_survived_data_line(age_data,'Age')
+    draw_continuous_feature_to_survived_data_line(fare_data,'Fare')
+
+
+
+def build_module(train_data):
+    data = train_data
     # pick feature 'Pclass' and 'Sex' for logistic regression
-    train_X = pd.DataFrame(data,columns=['Pclass','Sex','Age'])
+    train_X = pd.DataFrame(data, columns=['Pclass', 'Sex', 'Age'])
     train_X = data_clean(train_X)
 
     # checkout if has nan value
     # print(train_X[train_X['Age'].isnull().values==True].head())
-
-    y = pd.DataFrame(data,columns=['Survived'])
-    lr = LogisticRegression(random_state=0).fit(train_X,y)
+    y = pd.DataFrame(data, columns=['Survived'])
+    lr = LogisticRegression(random_state=0).fit(train_X, y)
 
     # use module to predict test data
     test_data = pd.read_csv('test.csv')
-    test_X = pd.DataFrame(test_data,columns=['Pclass','Sex','Age'])
+    test_X = pd.DataFrame(test_data, columns=['Pclass', 'Sex', 'Age'])
     test_X = data_clean(test_X)
     output_y = lr.predict(test_X)
 
     # save result
-    result = pd.DataFrame(test_data,columns=['PassengerId'])
+    result = pd.DataFrame(test_data, columns=['PassengerId'])
     result['Survived'] = pd.Series(output_y)
     print(result.head())
 
-    pd.DataFrame.to_csv(result,path_or_buf='result.csv',index=False)
+    pd.DataFrame.to_csv(result, path_or_buf='result.csv', index=False)
     print('输出结果完成')
+
 def data_clean(data):
     data['Sex'] = data['Sex'].map({
         'male': 1,
         'female': 0
     })
+    # fill the missing age with mean value
     data['Age'] = data['Age'].fillna(value=data['Age'].mean())
     return data
 
@@ -62,45 +94,75 @@ def draw_dot(data):
     plt.ylabel('Sex')
     plt.show()
 
-# 明显3等舱的存活率更低，1等舱存活率最高
-def draw_class_data_bar(class_data):
-    x = sorted(class_data['Pclass'].unique())
-    survived_0 = class_data[class_data['Survived'] == 0]
-    survived_1 = class_data[class_data['Survived'] == 1]
-    survived_count_0 = sorted(survived_0['Pclass'].value_counts())
-    survived_count_1 = sorted(survived_1['Pclass'].value_counts())
-    bar_weight = 0.3
-    x_index = np.arange(len(x))
-    plt.bar(x_index,survived_count_0,label='no_survived',color='r',width=bar_weight)
-    plt.bar(x_index+bar_weight,survived_count_1,label='survived',color='b',width=bar_weight,tick_label=['1','2','3'])
-    plt.legend()
-    plt.xticks(x_index+bar_weight/2,x)
-    plt.xlabel('Pclass')
-    plt.ylabel('nums')
-    plt.show()
-    # 验证数据是否都显示
-    print("1 class survived rate:",survived_count_1[0]/(survived_count_1[0]+survived_count_0[0]))
-    print("2 class survived rate:",survived_count_1[1]/(survived_count_1[1]+survived_count_0[1]))
-    print("3 class survived rate:",survived_count_1[2]/(survived_count_1[2]+survived_count_0[2]))
-#
-def draw_sex_data_bar(sex_data):
-    x = sorted(sex_data['Sex'].unique())
-    survived_0 = sex_data[sex_data['Survived'] == 0]
-    survived_1 = sex_data[sex_data['Survived'] == 1]
-    survived_count_0 = sorted(survived_0['Sex'].value_counts())
-    survived_count_1 = sorted(survived_1['Sex'].value_counts())
-    bar_weight = 0.3
-    x_index = np.arange(len(x))
-    plt.bar(x_index,survived_count_0,label='no_survived',color='r',width=bar_weight)
-    plt.bar(x_index+bar_weight,survived_count_1,label='survived',color='b',width=bar_weight)
-    plt.legend()
-    plt.xticks(x_index+bar_weight/2,x)
-    plt.xlabel('Pclass')
-    plt.ylabel('nums')
-    plt.show()
-    # 验证数据是否都显示
-    print("female survived rate:",survived_count_1[0]/(survived_count_1[0]+survived_count_0[0]))
-    print("male survived rate:",survived_count_1[1]/(survived_count_1[1]+survived_count_0[1]))
+# draw survived line for continuous value
+def draw_continuous_feature_to_survived_data_line(feature_data,feature_name):
+    feature = sorted(feature_data[feature_name].unique())
+    survived_0 = feature_data[feature_data['Survived'] == 0]
+    survived_1 = feature_data[feature_data['Survived'] == 1]
+    survived_count_0 = survived_0[feature_name].value_counts().sort_index()
+    survived_count_1 = survived_1[feature_name].value_counts().sort_index()
+    survived_rate = survived_count_1/(survived_count_1+survived_count_0)
+    # plt.plot(survived_count_0.index,survived_count_0, 's-',label='no_survived', color='r')
+    # plt.plot(survived_count_1.index,survived_count_1, 'o-',label='survived', color='b')
+    plt.plot(survived_rate.index,survived_rate, 'o-',label='survived', color='g')
 
+    plt.legend()
+    plt.xlabel(feature_name)
+    plt.ylabel('nums')
+    plt.show()
+
+
+# draw survived rate bar for discrete value
+def draw_discrete_feature_to_survived_rate_line(feature_data,feature_name):
+    feature = sorted(feature_data[feature_name].unique())
+    survived_0 = feature_data[feature_data['Survived'] == 0]
+    survived_1 = feature_data[feature_data['Survived'] == 1]
+    survived_count_0 = survived_0[feature_name].value_counts().sort_index()
+    survived_count_1 = survived_1[feature_name].value_counts().sort_index()
+    survived_rate = survived_count_1/(survived_count_1+survived_count_0)
+    # 数据补齐
+    for i in feature:
+        if i not in survived_count_0:
+            survived_count_0[i] = 0
+        if i not in survived_count_1:
+            survived_count_1[i] = 0
+    bar_weight = 0.3
+    x_index = np.arange(len(feature))
+    plt.plot(survived_rate.index, survived_rate, label='survived', color='r')
+    plt.legend()
+    plt.xticks(x_index + bar_weight / 2, feature)
+    plt.xlabel(feature_name)
+    plt.ylabel('nums')
+    plt.show()
+
+# draw survived bar for discrete value
+def draw_discrete_feature_to_survived_data_bar(feature_data,feature_name):
+    feature = sorted(feature_data[feature_name].unique())
+    survived_0 = feature_data[feature_data['Survived'] == 0]
+    survived_1 = feature_data[feature_data['Survived'] == 1]
+    survived_count_0 = survived_0[feature_name].value_counts().sort_index()
+    survived_count_1 = survived_1[feature_name].value_counts().sort_index()
+    # 数据补齐
+    for i in feature:
+        if i not in survived_count_0:
+            survived_count_0[i] = 0
+        if i not in survived_count_1:
+            survived_count_1[i] = 0
+    bar_weight = 0.3
+    x_index = np.arange(len(feature))
+    plt.bar(x_index, survived_count_0, label='no_survived', color='r', width=bar_weight)
+    plt.bar(x_index + bar_weight, survived_count_1, label='survived', color='b', width=bar_weight,
+            tick_label=feature_name)
+    plt.legend()
+    plt.xticks(x_index + bar_weight / 2, feature)
+    plt.xlabel(feature_name)
+    plt.ylabel('nums')
+    plt.show()
+    # 验证数据是否都显示
+    sum = 0
+    for i in feature:
+        sum+=survived_count_1[i]+survived_count_0[i]
+        print(i,feature_name, "survived rate:", survived_count_1[i] / (survived_count_1[i] + survived_count_0[i]))
+    print('total record:',sum)
 if __name__ == '__main__':
     main()

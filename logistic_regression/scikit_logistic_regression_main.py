@@ -15,12 +15,32 @@ def main():
 
     # test_data = pd.DataFrame(data,columns=['Survived','Pclass','Sex'])
     # draw_dot(test_data)
+    used_feature = ['Pclass', 'Sex', 'Age','Embarked']
+    # data = data_clean(data)
+    # print(data['Sex'].head())
+    build_module(data,used_feature)
 
-    # build_module(data)
+    # cabin_data = pd.DataFrame(data, columns=['Survived', 'Cabin'])
+    # print(cabin_data.head())
+    # print(cabin_data.describe())
+    #
+    # embarked_data = pd.DataFrame(data, columns=['Survived', 'Embarked'])
+    # print(embarked_data.head())
+    # print(embarked_data.describe())
+    #
+    # print(embarked_data.columns)
+    # embarked_data = data_clean(embarked_data)
 
-    class_data = pd.DataFrame(data,columns=['Survived','Pclass'])
-    sex_data = pd.DataFrame(data,columns=['Survived','Sex'])
-    sibsp_data = pd.DataFrame(data,columns=['Survived','SibSp'])
+
+    #
+    # analyze_feature(data)
+
+
+
+def analyze_feature(data):
+    class_data = pd.DataFrame(data, columns=['Survived', 'Pclass'])
+    sex_data = pd.DataFrame(data, columns=['Survived', 'Sex'])
+    sibsp_data = pd.DataFrame(data, columns=['Survived', 'SibSp'])
     parch_data = pd.DataFrame(data, columns=['Survived', 'Parch'])
     age_data = pd.DataFrame(data, columns=['Survived', 'Age'])
     ticket_data = pd.DataFrame(data, columns=['Survived', 'Ticket'])
@@ -38,25 +58,24 @@ def main():
     # draw_discrete_feature_to_survived_data_bar(embarked_data,'Embarked')
     # draw_discrete_feature_to_survived_data_bar(cabin_data,'Cabin')
 
-    draw_discrete_feature_to_survived_rate_line(sibsp_data,'SibSp')
-    draw_discrete_feature_to_survived_rate_line(class_data,'Pclass')
-    draw_discrete_feature_to_survived_rate_line(sex_data,'Sex')
-    draw_discrete_feature_to_survived_rate_line(parch_data,'Parch')
-    draw_discrete_feature_to_survived_rate_line(ticket_data,'Ticket')
-    draw_discrete_feature_to_survived_rate_line(embarked_data,'Embarked')
-    draw_discrete_feature_to_survived_rate_line(cabin_data,'Cabin')
+    draw_discrete_feature_to_survived_rate_line(sibsp_data, 'SibSp')  # not sure
+    draw_discrete_feature_to_survived_rate_line(class_data, 'Pclass')  # sure
+    draw_discrete_feature_to_survived_rate_line(sex_data, 'Sex')  # sure
+    draw_discrete_feature_to_survived_rate_line(parch_data, 'Parch')  # not sure
+    # draw_discrete_feature_to_survived_rate_line(ticket_data,'Ticket')
+    draw_discrete_feature_to_survived_rate_line(embarked_data,'Embarked') # sure
+    # draw_discrete_feature_to_survived_rate_line(cabin_data,'Cabin')
 
-    draw_continuous_feature_to_survived_data_line(age_data,'Age')
-    draw_continuous_feature_to_survived_data_line(fare_data,'Fare')
+    draw_continuous_feature_to_survived_data_line(age_data, 'Age')
+    draw_continuous_feature_to_survived_data_line(fare_data, 'Fare')
+    # draw_continuous_feature_to_survived_data_line(ticket_data, 'Ticket')
 
-
-
-def build_module(train_data):
+def build_module(train_data,used_feature):
     data = train_data
     # pick feature 'Pclass' and 'Sex' for logistic regression
-    train_X = pd.DataFrame(data, columns=['Pclass', 'Sex', 'Age'])
+    train_X = pd.DataFrame(data, columns=used_feature)
     train_X = data_clean(train_X)
-
+    print(train_X.isna)
     # checkout if has nan value
     # print(train_X[train_X['Age'].isnull().values==True].head())
     y = pd.DataFrame(data, columns=['Survived'])
@@ -64,7 +83,7 @@ def build_module(train_data):
 
     # use module to predict test data
     test_data = pd.read_csv('test.csv')
-    test_X = pd.DataFrame(test_data, columns=['Pclass', 'Sex', 'Age'])
+    test_X = pd.DataFrame(test_data, columns=used_feature)
     test_X = data_clean(test_X)
     output_y = lr.predict(test_X)
 
@@ -77,13 +96,27 @@ def build_module(train_data):
     print('输出结果完成')
 
 def data_clean(data):
-    data['Sex'] = data['Sex'].map({
-        'male': 1,
-        'female': 0
-    })
+    if 'Sex' in data.columns:
+        data['Sex'] = data['Sex'].map({
+            'male': 1,
+            'female': 0
+        })
     # fill the missing age with mean value
-    data['Age'] = data['Age'].fillna(value=data['Age'].mean())
+    if 'Age' in data.columns:
+        data['Age'] = data['Age'].fillna(value=data['Age'].mean())
+
+    if 'Embarked' in data.columns:
+        data['Embarked'] = data['Embarked'].fillna(value=data['Embarked'].value_counts().idxmax())
+        data['Embarked'] = translate_enum(data['Embarked'])
     return data
+
+def translate_enum(series):
+    count = series.unique()
+    index = 0
+    for i in count:
+        index += 1
+        series = series.replace(i,index)
+    return series
 
 def draw_dot(data):
     survived_0 = data[data['Survived'] == 0]

@@ -23,7 +23,7 @@ def main():
     # cabin_data = pd.DataFrame(data, columns=['Survived', 'Cabin'])
     # print(cabin_data.head())
     # print(cabin_data.describe())
-    #
+    #tsasw                                                                                                              /?
     # embarked_data = pd.DataFrame(data, columns=['Survived', 'Embarked'])
     # print(embarked_data.head())
     # print(embarked_data.describe())

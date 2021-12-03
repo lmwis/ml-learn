@@ -15,8 +15,8 @@ def main():
 
     # test_data = pd.DataFrame(data,columns=['Survived','Pclass','Sex'])
     # draw_dot(test_data)
-    used_feature = ['Pclass', 'Sex', 'Age','Embarked']
-    # data = data_clean(data)
+    used_feature = ['Pclass', 'Sex', 'Age','Embarked','SibSp','Parch']
+    data = data_clean(data)
     # print(data['Sex'].head())
     build_module(data,used_feature)
 
@@ -67,14 +67,14 @@ def analyze_feature(data):
     # draw_discrete_feature_to_survived_rate_line(cabin_data,'Cabin')
 
     draw_continuous_feature_to_survived_data_line(age_data, 'Age')
-    draw_continuous_feature_to_survived_data_line(fare_data, 'Fare')
+    draw_continuous_feature_to_survived_data_line(fare_data, 'Fare') # not sure
     # draw_continuous_feature_to_survived_data_line(ticket_data, 'Ticket')
 
 def build_module(train_data,used_feature):
     data = train_data
     # pick feature 'Pclass' and 'Sex' for logistic regression
     train_X = pd.DataFrame(data, columns=used_feature)
-    train_X = data_clean(train_X)
+    # train_X = data_clean(train_X)
     print(train_X.isna)
     # checkout if has nan value
     # print(train_X[train_X['Age'].isnull().values==True].head())
@@ -165,7 +165,7 @@ def draw_discrete_feature_to_survived_rate_line(feature_data,feature_name):
     plt.legend()
     plt.xticks(x_index + bar_weight / 2, feature)
     plt.xlabel(feature_name)
-    plt.ylabel('nums')
+    plt.ylabel('survived rate')
     plt.show()
 
 # draw survived bar for discrete value

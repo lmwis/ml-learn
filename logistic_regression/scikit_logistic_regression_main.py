@@ -16,9 +16,18 @@ def main():
     # test_data = pd.DataFrame(data,columns=['Survived','Pclass','Sex'])
     # draw_dot(test_data)
     used_feature = ['Pclass', 'Sex', 'Age','Embarked','SibSp','Parch']
-    data = data_clean(data)
+
+
+
+
+    # print(data['Cabin'].info())
+    # data = data_clean(data)
+    print(data.isnull().sum())
+    # print(data[data['Cabin'].notnull()].value_counts())
+    # data = set_cabin_type(data)
+    # print(data['Cabin'].head())
     # print(data['Sex'].head())
-    build_module(data,used_feature)
+    # build_module(data,used_feature)
 
     # cabin_data = pd.DataFrame(data, columns=['Survived', 'Cabin'])
     # print(cabin_data.head())
@@ -35,7 +44,11 @@ def main():
     #
     # analyze_feature(data)
 
-
+# change 'Cabin' feature to 'Yes' or 'No'
+def set_cabin_type(data):
+    data.loc[data['Cabin'].notnull()]='Yes'
+    data.loc[data['Cabin'].isnull()]='No'
+    return data
 
 def analyze_feature(data):
     class_data = pd.DataFrame(data, columns=['Survived', 'Pclass'])

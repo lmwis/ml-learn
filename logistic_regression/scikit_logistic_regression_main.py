@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn.linear_model import LogisticRegression
+import sklearn.linear_model as linear_model
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import cross_val_score, train_test_split
 import sklearn.preprocessing as preprocessing
@@ -25,7 +26,8 @@ def main():
     used_feature_regex = 'Age_.*|Pclass_.*|Cabin_.*|Embarked_.*|SibSp|Parch|Fare_.*|Sex_.*'
     # print(data['Cabin'].info())
     data = data_clean(data)
-
+    do_cross_validation(data)
+    return
     lr = build_module_regex(data,used_feature_regex)
 
     used_feature = pd.DataFrame(data).filter(regex=used_feature_regex).columns.values
@@ -40,6 +42,13 @@ def main():
 
     # view data with graph
     # analyze_feature(data)
+
+def do_cross_validation(data):
+    lr = linear_model.LogisticRegression(solver='liblinear',C=1.0, penalty='l1', tol=1e-6)
+    all_data = data.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*')
+    X = all_data.values[:,1:]
+    y = all_data.values[:,0]
+    print(cross_val_score(lr, X, y, cv=5))
 
 # scaling feature to [-1,1]
 def scaling_data(data,feature):
